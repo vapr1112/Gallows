@@ -20,6 +20,14 @@ string choise;
 string theme;
 string[] words;
 string searchWord = null;
+List<char> Word = new List<char>();
+char symbol;
+bool flag = false;
+List<char> listChar = new List<char>();
+bool breaker = false;
+bool checkWin = false, checkLose = false;
+char[] splitted;
+
 
 WriteLine($"{userName}, приветствуем тебя в игре \"ВИСЕЛИЦА\"");
 do
@@ -39,7 +47,7 @@ do
             theme = ReadLine();
             if (theme == "техника")
             {
-                words = File.ReadAllText("C:\\Users\\302k12\\source\\repos\\ВыселицаБобра\\Techic.txt").Split();
+                words = File.ReadAllText("C:\\Users\\User-PC\\source\\repos\\vapr1112\\Gallows\\Techic.txt").Split();
                 do
                 {
                     rnd = new Random().Next(0, 9);
@@ -81,180 +89,245 @@ do
 
 void Game(string searchWord)
 {
-    int size = searchWord.Length;
     int mistakes = 0;
-
+    Word.Add('|');
+    for (int i = 0; i < searchWord.Length; i++)
+    {
+        Word.Add('_');
+        Word.Add('|');
+    }
+    splitted = searchWord.ToCharArray();
 
     WriteLine(searchWord);
     Write("|");
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < searchWord.Length; i++)
     {
         Write("_|");
     }
-    WriteLine();
-
-    char symbol;
-    bool flag = false;
-    List<char> listChar = new List<char>();
-    bool breaker = false;
 
 
     do
     {
         WriteLine("Введите букву");
         symbol = Convert.ToChar(ReadLine());
-        if (!listChar.Any())
-        {
-            foreach (var c in listChar)
-            {
 
-                if (c == symbol)
+        bool ocherednoiFLAG = fun_flag();
+
+        for (int i = 0; i < splitted.Length; i++)
+        {
+            char c = splitted[i];
+
+            if (c == symbol)
+            {
+                flag = true;
+                PrintWord(searchWord, c, i);
+                for (int j = i; j < splitted.Length; j++)
                 {
-                    WriteLine("Этот символ был введен ранее, введите новый: ");
+                    c = splitted[j];
+                    if (c == symbol)
+                    {
+                        PrintWord(searchWord, c, j);
+                    }
                 }
+                foreach (var symb in Word)
+                {
+                    Write(symb);
+                }
+                break;
+            }
+            else
+            {
+                flag = false;
             }
         }
-        listChar.Add(symbol);
-    } while (true);
-    char[] splitted = searchWord.ToCharArray();
 
-
-    foreach (char c in splitted)
-    {
-        if (c == symbol)
+        if (Word.IndexOf('_') == -1)
         {
-            flag = true;
+            checkWin = true;
+            break;
         }
+        if (flag == false)
+        {
+            if (!ocherednoiFLAG)
+            {
+                mistakes++;
+            }
+        }
+        if (mistakes >= 10)
+        {
+            checkLose = true;
+        }
+        
+        listChar.Add(symbol);
+        if(PrintVISELICA(mistakes))
+        {
+            break;
+        }
+    } while (checkWin != true);
+    if (checkLose == true)
+    {
+        WriteLine($"\nИгрок {userName} был повешен.....\n");
+    }
+    else if (checkWin == true)
+    {
+        WriteLine($"\nИгрок {userName} избежал повешания!!!!!\n");
+    }
+}
 
+void PrintWord(string searchWord, char c, int i)
+{
+    Word[i * 2 + 1] = c;
+}
+
+bool fun_flag()
+{
+    if (listChar.Any())
+    {
+        foreach (var c in listChar)
+        {
+            if (c == symbol)
+            {
+                WriteLine("Этот символ был введен ранее, введите новый: ");
+                return true;
+            }
+        }
     }
 
+    return false;
+}
+
+bool PrintVISELICA(int mistakes)
+{
     if (mistakes == 1)
     {
-        WriteLine("     | \n");
-        WriteLine("     | \n");
+        WriteLine("\n     | ");
+        WriteLine("     | ");
         WriteLine("    _|_");
     }
     else if (mistakes == 2)
     {
-        WriteLine("         /| \n");
-        WriteLine("        / | \n");
+        WriteLine("\n         /| ");
+        WriteLine("        / | ");
         WriteLine("    ___/ _|_");
     }
     else if (mistakes == 3)
     {
-        WriteLine("         /|\\     \n");
-        WriteLine("        / | \\    \n");
+        WriteLine("\n         /|\\     ");
+        WriteLine("        / | \\    ");
         WriteLine("    ___/ _|_ \\___");
     }
     else if (mistakes == 4)
     {
-        WriteLine("          |       \n");
-        WriteLine("          |       \n");
-        WriteLine("          |       \n");
-        WriteLine("          |       \n");
-        WriteLine("          |       \n");
-        WriteLine("          |       \n");
-        WriteLine("          |       \n");
-        WriteLine("         /|\\     \n");
-        WriteLine("        / | \\    \n");
+        WriteLine("\n         |       ");
+        WriteLine("          |       ");
+        WriteLine("          |       ");
+        WriteLine("          |       ");
+        WriteLine("          |       ");
+        WriteLine("          |       ");
+        WriteLine("          |       ");
+        WriteLine("         /|\\     ");
+        WriteLine("        / | \\    ");
         WriteLine("    ___/ _|_ \\___");
     }
     else if (mistakes == 5)
     {
-        WriteLine("   _______        \n");
-        WriteLine("  |       |       \n");
-        WriteLine("          |       \n");
-        WriteLine("          |       \n");
-        WriteLine("          |       \n");
-        WriteLine("          |       \n");
-        WriteLine("          |       \n");
-        WriteLine("          |       \n");
-        WriteLine("         /|\\     \n");
-        WriteLine("        / | \\    \n");
+        WriteLine("\n   _______        ");
+        WriteLine("  |       |       ");
+        WriteLine("          |       ");
+        WriteLine("          |       ");
+        WriteLine("          |       ");
+        WriteLine("          |       ");
+        WriteLine("          |       ");
+        WriteLine("          |       ");
+        WriteLine("         /|\\     ");
+        WriteLine("        / | \\    ");
         WriteLine("    ___/ _|_ \\___");
     }
     else if (mistakes == 6)
     {
-        WriteLine("   _______        \n");
-        WriteLine("  |       |       \n");
-        WriteLine("  O       |       \n");
-        WriteLine("          |       \n");
-        WriteLine("          |       \n");
-        WriteLine("          |       \n");
-        WriteLine("          |       \n");
-        WriteLine("          |       \n");
-        WriteLine("         /|\\     \n");
-        WriteLine("        / | \\    \n");
+        WriteLine("\n   _______        ");
+        WriteLine("  |       |       ");
+        WriteLine("  O       |       ");
+        WriteLine("          |       ");
+        WriteLine("          |       ");
+        WriteLine("          |       ");
+        WriteLine("          |       ");
+        WriteLine("          |       ");
+        WriteLine("         /|\\     ");
+        WriteLine("        / | \\    ");
         WriteLine("    ___/ _|_ \\___");
     }
     else if (mistakes == 7)
     {
-        WriteLine("   _______        \n");
-        WriteLine("  |       |       \n");
-        WriteLine("  O       |       \n");
-        WriteLine("  |       |       \n");
-        WriteLine("  |       |       \n");
-        WriteLine("  |       |       \n");
-        WriteLine("          |       \n");
-        WriteLine("          |       \n");
-        WriteLine("         /|\\     \n");
-        WriteLine("        / | \\    \n");
+        WriteLine("\n   _______        ");
+        WriteLine("  |       |       ");
+        WriteLine("  O       |       ");
+        WriteLine("  |       |       ");
+        WriteLine("  |       |       ");
+        WriteLine("  |       |       ");
+        WriteLine("          |       ");
+        WriteLine("          |       ");
+        WriteLine("         /|\\     ");
+        WriteLine("        / | \\    ");
         WriteLine("    ___/ _|_ \\___");
     }
     else if (mistakes == 8)
     {
-        WriteLine("   _______        \n");
-        WriteLine("  |       |       \n");
-        WriteLine("  O       |       \n");
-        WriteLine(" /|       |       \n");
-        WriteLine("/ |       |       \n");
-        WriteLine("  |       |       \n");
-        WriteLine("          |       \n");
-        WriteLine("          |       \n");
-        WriteLine("         /|\\     \n");
-        WriteLine("        / | \\    \n");
+        WriteLine("\n   _______        ");
+        WriteLine("  |       |       ");
+        WriteLine("  O       |       ");
+        WriteLine(" /|       |       ");
+        WriteLine("/ |       |       ");
+        WriteLine("  |       |       ");
+        WriteLine("          |       ");
+        WriteLine("          |       ");
+        WriteLine("         /|\\     ");
+        WriteLine("        / | \\    ");
         WriteLine("    ___/ _|_ \\___");
     }
     else if (mistakes == 9)
     {
-        WriteLine("   _______        \n");
-        WriteLine("  |       |       \n");
-        WriteLine("  O       |       \n");
-        WriteLine(" /|\\      |      \n");
-        WriteLine("/ | \\     |      \n");
-        WriteLine("  |       |       \n");
-        WriteLine("          |       \n");
-        WriteLine("          |       \n");
-        WriteLine("         /|\\     \n");
-        WriteLine("        / | \\    \n");
+        WriteLine("\n   _______        ");
+        WriteLine("  |       |       ");
+        WriteLine("  O       |       ");
+        WriteLine(" /|\\     |      ");
+        WriteLine("/ | \\    |      ");
+        WriteLine("  |       |       ");
+        WriteLine("          |       ");
+        WriteLine("          |       ");
+        WriteLine("         /|\\     ");
+        WriteLine("        / | \\    ");
         WriteLine("    ___/ _|_ \\___");
     }
     else if (mistakes == 10)
     {
-        WriteLine("   _______        \n");
-        WriteLine("  |       |       \n");
-        WriteLine("  O       |       \n");
-        WriteLine(" /|\\      |      \n");
-        WriteLine("/ | \\     |      \n");
-        WriteLine("  |       |       \n");
-        WriteLine(" /        |       \n");
-        WriteLine("/         |       \n");
-        WriteLine("         /|\\     \n");
-        WriteLine("        / | \\    \n");
+        WriteLine("\n   _______        ");
+        WriteLine("  |       |       ");
+        WriteLine("  O       |       ");
+        WriteLine(" /|\\     |      ");
+        WriteLine("/ | \\    |      ");
+        WriteLine("  |       |       ");
+        WriteLine(" /        |       ");
+        WriteLine("/         |       ");
+        WriteLine("         /|\\     ");
+        WriteLine("        / | \\    ");
         WriteLine("    ___/ _|_ \\___");
     }
     else if (mistakes > 10)
     {
-        WriteLine("   _______        \n");
-        WriteLine("  |       |       \n");
-        WriteLine("  O       |       \n");
-        WriteLine(" /|\\      |      \n");
-        WriteLine("/ | \\     |      \n");
-        WriteLine("  |       |       \n");
-        WriteLine(" / \\      |      \n");
-        WriteLine("/   \\     |      \n");
-        WriteLine("         /|\\     \n");
-        WriteLine("        / | \\    \n");
-        WriteLine("    ___/ _|_ \\___");
+        WriteLine("\n   _______        ");
+        WriteLine("  |        |      ");
+        WriteLine("  O        |      ");
+        WriteLine(" /|\\      |      ");
+        WriteLine("/ | \\     |      ");
+        WriteLine("  |        |      ");
+        WriteLine(" / \\      |      ");
+        WriteLine("/   \\     |      ");
+        WriteLine("          /|\\     ");
+        WriteLine("         / | \\    ");
+        WriteLine("     ___/ _|_ \\___");
+        return true;
     }
+
+    return false;
 }
