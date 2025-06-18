@@ -13,10 +13,18 @@ using System.Runtime.CompilerServices;
 using System.Collections;
 using System.Text.Json;
 using System.Reflection.Metadata.Ecma335;
+using System.Runtime.Serialization;
+using System.Xml.Serialization;
+using System.Reflection;
+
+
+
+user user = new user();
 
 WriteLine("Введите своё имя: ");
+
+user.name = ReadLine();
 int rnd;
-string userName = ReadLine();
 string choise;
 string theme;
 string[] words;
@@ -26,69 +34,86 @@ char symbol = ' ';
 string str_symbol = null;
 bool flag = false;
 List<char> listChar = new List<char>();
-bool breaker = false;
 bool checkWin = false, checkLose = false;
 char[] splitted;
 
-
-WriteLine($"{userName}, приветствуем тебя в игре \"ВИСЕЛИЦА\"");
+WriteLine($"{user.name}, приветствуем тебя в игре \"ВИСЕЛИЦА\"");
 do
 {
-    WriteLine($"{userName}, ты хочешь продолжить игру? (да\\нет)");
+    WriteLine($"{user.name}, ты хочешь продолжить игру? (да\\нет)");
     choise = ReadLine();
-    if (choise == "нет")
+    switch(choise)
     {
-        WriteLine($"Вы ошиблись......\nЭто была ваша последняя попытка......\nИгрок {userName} был повешен.....\n");
-        break;
+        case "нет":
+            WriteLine($"Вы ошиблись......\nЭто была ваша последняя попытка......\nИгрок {user.name} был повешен.....\n");
+            return;  
+        case "да":
+            themes_world();
+            Game(searchWord);
+            break;
+        default:
+            WriteLine($"Вы ошиблись......\nЭто была ваша последняя попытка......\nИгрок {user.name} был повешен.....\n");
+            return; 
     }
-    else if (choise == "да")
-    {
-        do
-        {
-            WriteLine("Введи тему для игры (техника, одежда, животные)");
-            theme = ReadLine();
-            if (theme == "техника")
-            {
-                words = File.ReadAllText("C:\\Users\\User-PC\\source\\repos\\vapr1112\\Gallows\\Techic.txt").Split();
-                do
-                {
-                    rnd = new Random().Next(0, 9);
-                } while (rnd % 2 != 0);
-                searchWord = words[rnd];
-            }
-            else if (theme == "одежда")
-            {
-                words = File.ReadAllText("C:\\Users\\302k12\\source\\repos\\ВыселицаБобра\\Cloths.txt").Split();
-                do
-                {
-                    rnd = new Random().Next(0, 9);
-                } while (rnd % 2 != 0);
-                searchWord = words[rnd];
-            }
-            else if (theme == "животные")
-            {
-                words = File.ReadAllText("C:\\Users\\302k12\\source\\repos\\ВыселицаБобра\\Animals.txt").Split();
-                do
-                {
-                    rnd = new Random().Next(0, 9);
-                } while (rnd % 2 != 0);
-                searchWord = words[rnd];
-            }
-            else
-            {
-                WriteLine($"Введена неверная тема\n{userName}, повторите попытку\n");
-            }
-        } while (theme != "техника" && theme != "одежда" && theme != "животные");
+    XmlSerializer serializer = new XmlSerializer(typeof(user));
 
-        Game(searchWord);
-    }
-    else
+    using (Stream fstream = File.Create("statistic.xml"))
     {
-        WriteLine($"Вы ошиблись......\nЭто была ваша последняя попытка......\nИгрок {userName} был повешен.....\n");
-        return;
+        serializer.Serialize(fstream, user);
     }
+
+    using (Stream fstream = File.OpenRead("statistic.xml"))
+    {
+        user = (user)serializer.Deserialize(fstream);
+    }
+
 } while (true);
 
+//функция с выбором темы слова
+void themes_world()
+{
+    bool flag_is_find = false;
+    search_themes themes_del = random_word;
+    //словарь, в котором хранятся темы и пути к файлам (ключ, значение)
+    var theme_paths = new Dictionary<string, string>()
+    {
+        ["техника"] = "C:\\Users\\User-PC\\source\\repos\\vapr1112\\Gallows\\Techic.txt",
+        ["одежда"] = "C:\\Users\\User-PC\\source\\repos\\vapr1112\\Gallows\\Cloths.txt",
+        ["животные"] = "C:\\Users\\302k12\\source\\repos\\ВыселицаБобра\\Animals.txt"
+    };
+    do
+    {
+        WriteLine("Введи тему для игры (техника, одежда, животные)");
+        theme = ReadLine();
+        foreach(string word_p in theme_paths.Keys)
+        {
+            if(word_p == theme)
+            {
+                //передаем путь к файлу в делегат
+                themes_del(theme_paths[theme]);
+                flag_is_find = true;
+            }
+        }
+        //если флаг не true, то тема введена неверно
+        if (!flag_is_find)
+        {
+            WriteLine($"Введена неверная тема\n{user.name}, повторите попытку\n");
+        }
+    } while (theme != "техника" && theme != "одежда" && theme != "животные");
+}
+
+//выбирается рандомное слово из файла
+void random_word(string path)
+{
+    words = File.ReadAllText(path).Split();
+    do
+    {
+        rnd = new Random().Next(0, 9);
+    } while (rnd % 2 != 0);
+    searchWord = words[rnd];
+}
+
+//игра
 void Game(string searchWord)
 {
     int mistakes = 0;
@@ -106,7 +131,6 @@ void Game(string searchWord)
     {
         Write("_|");
     }
-
 
     do
     {
@@ -173,11 +197,13 @@ void Game(string searchWord)
     } while (checkWin != true);
     if (checkLose == true)
     {
-        WriteLine($"\nИгрок {userName} был повешен.....\n");
+        WriteLine($"\nИгрок {user.name} был повешен.....\n");
+        user.count_lose++;
     }
     else if (checkWin == true)
     {
-        WriteLine($"\nИгрок {userName} избежал повешания!!!!!\n");
+        WriteLine($"\nИгрок {user.name} избежал повешания!!!!!\n");
+        user.count_win++;
     }
 }
 
@@ -343,4 +369,35 @@ bool PrintVISELICA(int mistakes)
     }
 
     return false;
+}
+
+delegate void search_themes(string path);
+
+public class user
+{
+    public string name {  get; set; }
+
+    public int count_win {  get; set; }
+
+    public int count_lose { get; set; }
+
+    public user() { count_win = 0; count_lose = 0; }
+
+    public user(string name_p, int count_win_p, int count_lose_p)
+    {
+        name = name_p;
+        count_win = count_win_p;
+        count_lose = count_lose_p;
+    }
+
+    public override string ToString()
+    {
+        return $"имя пользователя {name} количесво побед {count_win} количество поражений {count_lose}";
+    }
+
+    public void statictic()
+    {
+        WriteLine("статистика");
+        WriteLine(ToString());
+    }
 }
