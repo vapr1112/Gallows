@@ -12,6 +12,7 @@ using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Collections;
 using System.Text.Json;
+using System.Reflection.Metadata.Ecma335;
 
 WriteLine("Введите своё имя: ");
 int rnd;
@@ -21,7 +22,8 @@ string theme;
 string[] words;
 string searchWord = null;
 List<char> Word = new List<char>();
-char symbol;
+char symbol = ' ';
+string str_symbol = null;
 bool flag = false;
 List<char> listChar = new List<char>();
 bool breaker = false;
@@ -108,8 +110,13 @@ void Game(string searchWord)
 
     do
     {
-        WriteLine("Введите букву");
-        symbol = Convert.ToChar(ReadLine());
+        do
+        {
+            WriteLine("\nВведите букву");
+            str_symbol = ReadLine();
+        } while (str_symbol.Length != 1);
+
+        symbol = str_symbol[0];
 
         bool ocherednoiFLAG = fun_flag();
 
@@ -191,6 +198,12 @@ bool fun_flag()
                 return true;
             }
         }
+    }
+
+    if(symbol < 1072 || symbol > 1103)
+    {
+        WriteLine("введите русскую строчную букву!");
+        return true;
     }
 
     return false;
